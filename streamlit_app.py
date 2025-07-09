@@ -41,7 +41,7 @@ if user_question:
     st.write(matched_tweet["text"])
 
     st.subheader("Answer:")
-    if best_match_score >= 0.80:
+    if best_match_score >= 0.50:
         if not response_row.empty:
             st.write(response_row.iloc[0]["text"])
         else:
