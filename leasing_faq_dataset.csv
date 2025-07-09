@@ -1,0 +1,53 @@
+tweet_id,author_id,inbound,created_at,text,response_tweet_id,in_response_to_tweet_id
+1,user,True,2025-07-09 13:36:44.439898,What is a personal contract hire (PCH) agreement?,2,
+2,bot,False,2025-07-09 13:36:44.439898,A personal contract hire (PCH) agreement involves you signing a contract to lease a car for a fixed period of time at an agreed monthly cost...,,1
+3,user,True,2025-07-09 13:36:44.439898,What is the difference between personal contract hire (PCH) and personal contract purchase (PCP)?,4,
+4,bot,False,2025-07-09 13:36:44.439898,"With both PCH and PCP agreements, the finance company owns the vehicle throughout the lease...",,3
+5,user,True,2025-07-09 13:36:44.439898,What is the difference between personal and business contract hire?,6,
+6,bot,False,2025-07-09 13:36:44.439898,Business contract hire is popular with fleets and works like personal contract hire but for companies...,,5
+7,user,True,2025-07-09 13:36:44.439898,Is it a good idea to lease a new car?,8,
+8,bot,False,2025-07-09 13:36:44.439898,Cars depreciate quickly. Leasing helps avoid value loss by turning depreciation into fixed payments...,,7
+9,user,True,2025-07-09 13:36:44.439898,Do you advertise ‘no deposit’ lease deals on Leasing.com?,10,
+10,bot,False,2025-07-09 13:36:44.439898,"We don’t advertise ‘no deposit’ lease deals, but some have a one-month initial rental...",,9
+11,user,True,2025-07-09 13:36:44.439898,What is the difference between an ‘in stock’ deal and a ‘factory’ order?,12,
+12,bot,False,2025-07-09 13:36:44.439898,"‘In stock’ means ready-to-go cars, while ‘factory’ orders need building and have longer delivery...",,11
+13,user,True,2025-07-09 13:36:44.439898,Is insurance included in a car lease deal?,14,
+14,bot,False,2025-07-09 13:36:44.439898,"No, insurance is not included in lease deals...",,13
+15,user,True,2025-07-09 13:36:44.439898,Can you get car insurance if you’re not the registered owner?,16,
+16,bot,False,2025-07-09 13:36:44.439898,Yes. Lease cars are insured even if you're not the legal owner...,,15
+17,user,True,2025-07-09 13:36:44.439898,Can you lease a second car?,18,
+18,bot,False,2025-07-09 13:36:44.439898,"Yes, if you pass credit and affordability checks...",,17
+19,user,True,2025-07-09 13:36:44.439898,Is road tax included in a car lease?,20,
+20,bot,False,2025-07-09 13:36:44.439898,"Yes, it’s usually included for the lease duration or at least 12 months...",,19
+21,user,True,2025-07-09 13:36:44.439898,What happens if road tax increases during my lease contract?,22,
+22,bot,False,2025-07-09 13:36:44.439898,You may be liable for any increases in Vehicle Excise Duty...,,21
+23,user,True,2025-07-09 13:36:44.439898,Is servicing and maintenance included in a car lease?,24,
+24,bot,False,2025-07-09 13:36:44.439898,"Some leases include maintenance. If not, you must service it yourself at approved centers...",,23
+25,user,True,2025-07-09 13:36:44.439898,What does initial rental mean?,26,
+26,bot,False,2025-07-09 13:36:44.439898,"It’s the upfront payment—e.g., 6 months of lease cost upfront...",,25
+27,user,True,2025-07-09 13:36:44.439898,Is there a mileage limit on a car lease?,28,
+28,bot,False,2025-07-09 13:36:44.439898,"Yes, all leases have mileage limits with excess charges...",,27
+29,user,True,2025-07-09 13:36:44.439898,Can I amend the agreed mileage part-way through a contract?,30,
+30,bot,False,2025-07-09 13:36:44.439898,"Yes, contact the leasing company to amend the mileage and monthly cost...",,29
+31,user,True,2025-07-09 13:36:44.439898,Can I lease a car if I have bad credit?,32,
+32,bot,False,2025-07-09 13:36:44.439898,"Yes, but credit checks apply and approval might be harder...",,31
+33,user,True,2025-07-09 13:36:44.439898,Who supplies the lease car?,34,
+34,bot,False,2025-07-09 13:36:44.439898,Leasing.com advertises deals from UK brokers and dealers...,,33
+35,user,True,2025-07-09 13:36:44.439898,Is delivery and collection included in a lease deal?,36,
+36,bot,False,2025-07-09 13:36:44.439898,"Usually yes, delivery to mainland UK is included...",,35
+37,user,True,2025-07-09 13:36:44.439898,Can I part-exchange my existing car?,38,
+38,bot,False,2025-07-09 13:36:44.439898,"Leasing.com can’t buy your car, but can help sell it via Motorway...",,37
+39,user,True,2025-07-09 13:36:44.439898,What happens if a leased car windscreen cracks?,40,
+40,bot,False,2025-07-09 13:36:44.439898,"Check if your lease or insurance covers it. Otherwise, repair yourself...",,39
+41,user,True,2025-07-09 13:36:44.439898,What if the car gets damaged during the lease?,42,
+42,bot,False,2025-07-09 13:36:44.439898,Minor damage is fine; major damage must be repaired before return...,,41
+43,user,True,2025-07-09 13:36:44.439898,What happens if my lease car is written off or stolen?,44,
+44,bot,False,2025-07-09 13:36:44.439898,The insurer deals directly with the lease company. GAP insurance is recommended...,,43
+45,user,True,2025-07-09 13:36:44.439898,What lengths of contract are available?,46,
+46,bot,False,2025-07-09 13:36:44.439898,Lease terms range from 12 to 60 months...,,45
+47,user,True,2025-07-09 13:36:44.439898,Can I put a personal number plate on the car?,48,
+48,bot,False,2025-07-09 13:36:44.439898,"Yes, with permission from the finance company...",,47
+49,user,True,2025-07-09 13:36:44.439898,Can I exit the lease deal early or transfer a lease to another person?,50,
+50,bot,False,2025-07-09 13:36:44.439898,Early termination usually has fees. Transfers depend on the lease company...,,49
+51,user,True,2025-07-09 13:36:44.439898,What happens to your lease agreement if you die?,52,
+52,bot,False,2025-07-09 13:36:44.439898,Termination penalties may still apply; the estate must settle them...,,51
