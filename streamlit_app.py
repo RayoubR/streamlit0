@@ -1,52 +1,52 @@
 import streamlit as st
 import pandas as pd
-import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 # Title
-st.title("🤖 Leasing AI Assistant :°)")
+st.title("Smart QA System - NLP Matching")
 
-# Load the dataset
+# Load CSV
 @st.cache_data
 def load_data():
-    return pd.read_csv("https://raw.githubusercontent.com/RayoubR/streamlit0/refs/heads/master/sample.csv")
+    df = pd.read_csv("sample.csv")
+    df.dropna(subset=["Question", "Answer"], inplace=True)
+    return df
 
 df = load_data()
 
-# Clean the question text
-def clean_text(text):
-    text = text.lower()
-    text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
-    return text
+# Input question
+user_question = st.text_input("Ask your question here:")
 
-df['clean_question'] = df['question'].astype(str).apply(clean_text)
+if user_question:
+    # Combine user's question with dataset questions
+    questions = df["Question"].tolist()
+    questions.append(user_question)
 
-# TF-IDF Vectorizer
-vectorizer = TfidfVectorizer()
-X = vectorizer.fit_transform(df['clean_question'])
+    # Vectorize using TF-IDF
+    vectorizer = TfidfVectorizer()
+    vectors = vectorizer.fit_transform(questions)
 
-# Find the best match using cosine similarity
-def find_best_match(user_input):
-    user_input_clean = clean_text(user_input)
-    user_vec = vectorizer.transform([user_input_clean])
-    similarities = cosine_similarity(user_vec, X)
-    index = similarities.argmax()
-    return df.iloc[index]['answer'], df.iloc[index]['question']
+    # Compute cosine similarity between user's question and dataset questions
+    cosine_similarities = cosine_similarity(vectors[-1], vectors[:-1])
 
-# User input
-st.subheader("💬 Ask a question about leasing:")
-user_input = st.text_input("Type your question here")
+    # Find the most similar question
+    most_similar_idx = cosine_similarities.argmax()
+    similarity_score = cosine_similarities[0, most_similar_idx]
 
-# Answer section
-if user_input:
-    answer, matched_q = find_best_match(user_input)
-    st.markdown("### 🔍 Matched Question:")
-    st.info(matched_q)
-    st.markdown("### 💡 Answer:")
-    st.success(answer)
+    # Get matched question and answer
+    matched_question = df.iloc[most_similar_idx]["Question"]
+    matched_answer = df.iloc[most_similar_idx]["Answer"]
 
-# Optional: Preview data
-with st.expander("🔎 Preview Dataset"):
-    st.dataframe(df[['question', 'answer']].head(10))
+    # Display results
+    st.subheader("Matched Question:")
+    st.write(matched_question)
 
+    st.subheader("Answer:")
+    st.write(matched_answer)
+
+    st.info(f"Similarity score: {similarity_score:.2f}")
+
+# Optional: Show dataset
+with st.expander("Show dataset"):
+    st.dataframe(df)
