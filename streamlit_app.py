@@ -3,50 +3,51 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Title
-st.title("Smart QA System - NLP Matching :)")
-
-# Load CSV
+# Load and preprocess data
 @st.cache_data
 def load_data():
     df = pd.read_csv("sample.csv")
-    df.dropna(subset=["Question", "Answer"], inplace=True)
+    df.dropna(subset=["text"], inplace=True)
+    df["inbound"] = df["inbound"].astype(str).str.lower() == "true"
     return df
 
-df = pd.read_csv("https://raw.githubusercontent.com/RayoubR/streamlit0/refs/heads/master/sample.csv")
+df = load_data()
 
-# Input question
-user_question = st.text_input("Ask your question here:")
+# Separate inbound (questions) and outbound (responses)
+questions_df = df[df["inbound"] == True]
+responses_df = df[df["inbound"] == False]
 
-# if user_question:
-    # Combine user's question with dataset questions
-   # questions = df["Question"].tolist()
-   # questions.append(user_question)
+# User input
+st.title("Tweet-Based Question Answering System")
+user_question = st.text_input("Enter your question:")
 
-    # Vectorize using TF-IDF
-   # vectorizer = TfidfVectorizer()
-   # vectors = vectorizer.fit_transform(questions)
+if user_question:
+    # Build TF-IDF vectors for the inbound questions
+    tfidf = TfidfVectorizer()
+    question_texts = questions_df["text"].tolist()
+    vectors = tfidf.fit_transform(question_texts + [user_question])
 
-    # Compute cosine similarity between user's question and dataset questions
-    #cosine_similarities = cosine_similarity(vectors[-1], vectors[:-1])
+    # Compute similarity
+    cosine_similarities = cosine_similarity(vectors[-1], vectors[:-1])
+    best_match_idx = cosine_similarities.argmax()
+    best_match_score = cosine_similarities[0, best_match_idx]
+    matched_tweet = questions_df.iloc[best_match_idx]
 
-    # Find the most similar question
-  #  most_similar_idx = cosine_similarities.argmax()
-    #similarity_score = cosine_similarities[0, most_similar_idx]
-
-    # Get matched question and answer
-   # matched_question = df.iloc[most_similar_idx]["Question"]
-  #  matched_answer = df.iloc[most_similar_idx]["Answer"]
+    # Find response to matched tweet
+    response_row = responses_df[responses_df["in_response_to_tweet_id"] == matched_tweet["tweet_id"]]
 
     # Display results
-  #  st.subheader("Matched Question:")
-   # st.write(matched_question)
+    st.subheader("Most Similar Question:")
+    st.write(matched_tweet["text"])
 
-    #st.subheader("Answer:")
-   # st.write(matched_answer)
+    st.subheader("Answer:")
+    if not response_row.empty:
+        st.write(response_row.iloc[0]["text"])
+    else:
+        st.warning("No response found for the matched question.")
 
-   # st.info(f"Similarity score: {similarity_score:.2f}")
+    st.info(f"Similarity Score: {best_match_score:.2f}")
 
-# Optional: Show dataset
-with st.expander("Show dataset"):
+# Optional: Expand to show full dataset
+with st.expander("See raw dataset"):
     st.dataframe(df)
