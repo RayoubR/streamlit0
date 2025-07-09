@@ -18,7 +18,7 @@ questions_df = df[df["inbound"] == True]
 responses_df = df[df["inbound"] == False]
 
 # User input
-st.title("version 0.1.1: Question Answering System")
+st.title("version 0.1.2: Question Answering System")
 user_question = st.text_input("Enter your question:")
 
 if user_question:
