@@ -13,7 +13,7 @@ def load_data():
     df.dropna(subset=["Question", "Answer"], inplace=True)
     return df
 
-df = load_data()
+df = pd.read_csv("https://raw.githubusercontent.com/RayoubR/streamlit0/refs/heads/master/sample.csv")
 
 # Input question
 user_question = st.text_input("Ask your question here:")
