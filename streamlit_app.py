@@ -18,7 +18,7 @@ questions_df = df[df["inbound"] == True]
 responses_df = df[df["inbound"] == False]
 
 # User input
-st.title("version0 : Question Answering System")
+st.title("Tweet-Based Question Answering System")
 user_question = st.text_input("Enter your question:")
 
 if user_question:
@@ -41,10 +41,13 @@ if user_question:
     st.write(matched_tweet["text"])
 
     st.subheader("Answer:")
-    if not response_row.empty:
-        st.write(response_row.iloc[0]["text"])
+    if best_match_score >= 0.80:
+        if not response_row.empty:
+            st.write(response_row.iloc[0]["text"])
+        else:
+            st.warning("No response found for the matched question.")
     else:
-        st.warning("No response found for the matched question.")
+        st.write("Can you call the assistant for more info")
 
     st.info(f"Similarity Score: {best_match_score:.2f}")
 
