@@ -4,7 +4,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 # Title
-st.title("Smart QA System - NLP Matching")
+st.title("Smart QA System - NLP Matching :)")
 
 # Load CSV
 @st.cache_data
