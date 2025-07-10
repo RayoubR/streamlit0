@@ -4,31 +4,39 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 # --- PAGE CONFIG ---
-st.set_page_config(page_title="Leasing Q&A Bot", page_icon="💬", layout="wide")
+st.set_page_config(page_title="Leasing Q&A System", page_icon="🔍", layout="centered")
 
-# --- STYLING ---
+# --- CUSTOM CSS STYLING ---
 st.markdown("""
     <style>
-    .main {
-        background-color: #f7f9fc;
-        padding: 2rem;
+    html, body, [class*="css"]  {
+        font-family: 'Segoe UI', sans-serif;
     }
-    .question-box, .answer-box {
-        border-radius: 12px;
-        padding: 1rem;
+    .card {
+        background-color: #ffffff;
+        padding: 1.5rem;
         margin-top: 1rem;
+        border-radius: 10px;
+        box-shadow: 0px 2px 8px rgba(0,0,0,0.05);
     }
-    .question-box {
-        background-color: #e0f0ff;
-        border-left: 5px solid #1f77b4;
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #222;
     }
-    .answer-box {
-        background-color: #e8ffe8;
-        border-left: 5px solid #2ca02c;
+    .similarity-score {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+        border-radius: 20px;
+        margin-top: 0.5rem;
+        font-weight: 500;
+        color: white;
     }
-    .similarity-bar > div {
-        height: 24px;
-    }
+    .high { background-color: #4CAF50; }
+    .medium { background-color: #FFC107; color: black; }
+    .low { background-color: #f44336; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -44,14 +52,13 @@ df = load_data()
 questions_df = df[df["inbound"] == True]
 responses_df = df[df["inbound"] == False]
 
-# --- TITLE ---
-st.title("💡 Leasing Q&A Assistant (v0.1.4)")
-st.markdown("Ask a leasing-related question and get an instant answer powered by text similarity.")
+# --- HEADER ---
+st.title("Leasing Question Answering System")
+st.markdown("Type your leasing-related question below. The system will try to match it with existing Q&A data.")
 
-# --- INPUT ---
-user_question = st.text_input("🔎 Type your question here:")
+# --- USER INPUT ---
+user_question = st.text_input("Enter your question:")
 
-# --- PROCESSING ---
 if user_question:
     tfidf = TfidfVectorizer()
     question_texts = questions_df["text"].tolist()
@@ -62,25 +69,41 @@ if user_question:
     matched_tweet = questions_df.iloc[best_match_idx]
     response_row = responses_df[responses_df["in_response_to_tweet_id"] == matched_tweet["tweet_id"]]
 
-    # --- DISPLAY MATCH ---
-    st.markdown('<div class="question-box"><strong>🧠 Closest Match:</strong><br>' +
-                matched_tweet["text"] + '</div>', unsafe_allow_html=True)
-
-    # --- DISPLAY ANSWER ---
-    st.markdown('<div class="answer-box"><strong>✅ Answer:</strong><br>', unsafe_allow_html=True)
-    if best_match_score >= 0.30:
-        if not response_row.empty:
-            st.markdown(response_row.iloc[0]["text"], unsafe_allow_html=True)
-        else:
-            st.warning("⚠️ No response found for the matched question.")
+    # --- SIMILARITY CLASS ---
+    if best_match_score >= 0.70:
+        similarity_class = "high"
+        confidence_label = "High Confidence"
+    elif best_match_score >= 0.30:
+        similarity_class = "medium"
+        confidence_label = "Moderate Confidence"
     else:
-        st.markdown("🤖 Please contact a human assistant for more information.")
-    st.markdown('</div>', unsafe_allow_html=True)
+        similarity_class = "low"
+        confidence_label = "Low Confidence"
 
-    # --- SIMILARITY SCORE ---
-    st.markdown("### 🔢 Similarity Score")
-    st.progress(best_match_score)
+    # --- DISPLAY MATCHED QUESTION ---
+    st.markdown(f"""
+    <div class="card">
+        <div class="section-title">Matched Question:</div>
+        {matched_tweet["text"]}
+    </div>
+    """, unsafe_allow_html=True)
 
-# --- OPTIONAL DATASET VIEW ---
-with st.expander("📊 View Raw Dataset"):
+    # --- DISPLAY RESPONSE ---
+    st.markdown(f"""
+    <div class="card">
+        <div class="section-title">Answer:</div>
+        {"<i>No answer found.</i>" if response_row.empty else response_row.iloc[0]['text']}
+    </div>
+    """, unsafe_allow_html=True)
+
+    # --- DISPLAY SIMILARITY ---
+    st.markdown(f"""
+    <div class="card">
+        <div class="section-title">Similarity Score:</div>
+        <span class="similarity-score {similarity_class}">{confidence_label}: {best_match_score:.2f}</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+# --- OPTIONAL: SHOW DATASET ---
+with st.expander("View Full Dataset"):
     st.dataframe(df)
