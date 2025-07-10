@@ -65,7 +65,7 @@ responses_df = df[df["inbound"] == False]
 
 # --- HEADER ---
 st.markdown("<h1 style='text-align: center;'>Leasing Q&A Assistant</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center;'>Ask your leasing-related question. We'll find the most relevant answer based on existing Q&A data.</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>Ask your leasing-related question. We'll find the most relevant answer based .</p>", unsafe_allow_html=True)
 st.markdown("---")
 
 # --- INPUT ---
@@ -122,4 +122,4 @@ with st.expander("📄 View Full Dataset (Raw CSV)"):
     st.dataframe(df)
 
 # --- FOOTER ---
-st.markdown("<div class='footer'>Built with ❤️ using Streamlit & scikit-learn • Version 0.1.4</div>", unsafe_allow_html=True)
+st.markdown("<div class='footer'>You are welcome anytime ❤️ </div>", unsafe_allow_html=True)
