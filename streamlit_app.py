@@ -6,7 +6,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Load and preprocess data
 @st.cache_data
 def load_data():
-    df = pd.read_csv("https://raw.githubusercontent.com/RayoubR/streamlit0/refs/heads/master/leasing_faq_dataset.csv")
+    df = pd.read_csv("https://raw.githubusercontent.com/RayoubR/streamlit0/refs/heads/master/Classeur1.csv")
     df.dropna(subset=["text"], inplace=True)
     df["inbound"] = df["inbound"].astype(str).str.lower() == "true"
     return df
@@ -18,7 +18,7 @@ questions_df = df[df["inbound"] == True]
 responses_df = df[df["inbound"] == False]
 
 # User input
-st.title("version 0.1.3: Question Answering System")
+st.title("version 0.1.4: Question Answering System")
 user_question = st.text_input("Enter your question:")
 
 if user_question:
