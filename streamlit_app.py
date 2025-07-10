@@ -1,48 +1,13 @@
 import streamlit as st
 import pandas as pd
-import torch
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.cluster import KMeans
 from sentence_transformers import SentenceTransformer, util
+import numpy as np
 
-# --- CONFIGURATION ---
-st.set_page_config(page_title="Smart Leasing Q&A", page_icon="💬", layout="centered")
-
-# --- STYLING ---
-st.markdown("""
-    <style>
-    body {
-        background-color: #f8f9fa;
-    }
-    .card {
-        background-color: #ffffff;
-        border-radius: 10px;
-        padding: 20px;
-        margin-top: 15px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-    .title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin-bottom: 10px;
-    }
-    .score {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        color: #fff;
-    }
-    .high { background-color: #198754; }
-    .medium { background-color: #ffc107; color: black; }
-    .low { background-color: #dc3545; }
-    </style>
-""", unsafe_allow_html=True)
-
-# --- LOAD MODEL ---
-@st.cache_resource
-def load_model():
-    return SentenceTransformer('all-MiniLM-L6-v2')
-
-model = load_model()
+# --- PAGE CONFIG ---
+st.set_page_config(page_title="Clustered Q&A Assistant", page_icon="💬", layout="centered")
 
 # --- LOAD DATA ---
 @st.cache_data
@@ -56,55 +21,82 @@ df = load_data()
 questions_df = df[df["inbound"] == True].reset_index(drop=True)
 responses_df = df[df["inbound"] == False]
 
-# --- EMBEDDINGS ---
+# --- LOAD EMBEDDING MODEL ---
+@st.cache_resource
+def load_model():
+    return SentenceTransformer("all-MiniLM-L6-v2")
+
+model = load_model()
+
+# --- EMBED QUESTIONS ---
 @st.cache_data
-def embed_questions(text_list):
-    return model.encode(text_list, convert_to_tensor=True)
+def embed_questions(questions):
+    return model.encode(questions, convert_to_tensor=False)
 
 question_texts = questions_df["text"].tolist()
 question_embeddings = embed_questions(question_texts)
 
-# --- INTERFACE ---
-st.title("💡 Leasing Q&A Assistant")
-st.markdown("Type your leasing question below. We'll find the most relevant match.")
+# --- CLUSTERING (KMeans) ---
+NUM_CLUSTERS = 10  # Change depending on dataset size
 
-user_question = st.text_input("🔍 Ask a question:")
+@st.cache_data
+def cluster_questions(embeddings, k=NUM_CLUSTERS):
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+    labels = kmeans.fit_predict(embeddings)
+    return kmeans, labels
+
+kmeans_model, cluster_labels = cluster_questions(question_embeddings, NUM_CLUSTERS)
+questions_df["cluster"] = cluster_labels
+
+# --- UI ---
+st.title("💬 Clustered Leasing Q&A Assistant")
+st.markdown("Ask your leasing question. We'll match it to a cluster of related questions and return the best answer.")
+
+user_question = st.text_input("🔍 Your question:")
 
 if user_question:
-    # Encode input question
-    query_embedding = model.encode(user_question, convert_to_tensor=True)
+    # Step 1: Embed user question
+    user_embedding = model.encode([user_question])[0]
 
-    # Find most similar question
-    cosine_scores = util.cos_sim(query_embedding, question_embeddings)
-    top_k = torch.topk(cosine_scores, k=3)
+    # Step 2: Predict closest cluster
+    cluster_idx = kmeans_model.predict([user_embedding])[0]
 
-    for rank, (score, idx) in enumerate(zip(top_k[0][0], top_k[1][0])):
-        matched_q = questions_df.iloc[idx]
-        response_row = responses_df[responses_df["in_response_to_tweet_id"] == matched_q["tweet_id"]]
-        answer = response_row.iloc[0]["text"] if not response_row.empty else "*No response found.*"
+    # Step 3: Retrieve all Qs from that cluster
+    cluster_questions = questions_df[questions_df["cluster"] == cluster_idx]
+    cluster_embeddings = embed_questions(cluster_questions["text"].tolist())
 
-        # Confidence class
-        score_val = score.item()
-        if score_val >= 0.7:
-            conf_class = "high"
-            label = "High Confidence"
-        elif score_val >= 0.3:
-            conf_class = "medium"
-            label = "Moderate Confidence"
-        else:
-            conf_class = "low"
-            label = "Low Confidence"
+    # Step 4: Find most similar question in that cluster
+    similarities = cosine_similarity([user_embedding], cluster_embeddings)[0]
+    best_idx = similarities.argmax()
+    best_score = similarities[best_idx]
+    best_question_row = cluster_questions.iloc[best_idx]
 
-        st.markdown(f"""
-        <div class="card">
-            <div class="title">Matched Question #{rank+1}</div>
-            <p>{matched_q['text']}</p>
-            <div class="title">Answer:</div>
-            <p>{answer}</p>
-            <span class="score {conf_class}">{label}: {score_val:.2f}</span>
-        </div>
-        """, unsafe_allow_html=True)
+    # Step 5: Get response
+    response_row = responses_df[responses_df["in_response_to_tweet_id"] == best_question_row["tweet_id"]]
+    answer = response_row.iloc[0]["text"] if not response_row.empty else "No response found."
 
-# --- RAW DATA EXPANDER ---
+    # Confidence level
+    if best_score >= 0.7:
+        conf_color, conf_label = "#28a745", "High"
+    elif best_score >= 0.3:
+        conf_color, conf_label = "#ffc107", "Medium"
+    else:
+        conf_color, conf_label = "#dc3545", "Low"
+
+    # --- DISPLAY ---
+    st.markdown(f"### 🧠 Closest Matched Question (Cluster #{cluster_idx})")
+    st.info(best_question_row["text"])
+
+    st.markdown("### ✅ Answer")
+    st.success(answer)
+
+    st.markdown(f"""
+    <div style='margin-top: 1rem; padding: 0.5rem 1rem; border-radius: 8px;
+                background-color: {conf_color}; color: white; display: inline-block;'>
+        Confidence: {conf_label} ({best_score:.2f})
+    </div>
+    """, unsafe_allow_html=True)
+
+# --- OPTIONAL: Dataset Preview ---
 with st.expander("📄 View Full Dataset"):
     st.dataframe(df)
